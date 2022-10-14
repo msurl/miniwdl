@@ -32,9 +32,12 @@ class SubprocessBase(TaskContainer):
     @classmethod
     def detect_resource_limits(cls, cfg: config.Loader, logger: logging.Logger) -> Dict[str, int]:
         if not cls._resource_limits:
+            cpu_limit = cfg.get_int(section="resource_limits", key="cpu", default=multiprocessing.cpu_count())
+            memory_limit = cfg.get_int(section="resource_limits", key="mem_bytes", default=psutil.virtual_memory().total)
+
             cls._resource_limits = {
-                "cpu": multiprocessing.cpu_count(),
-                "mem_bytes": psutil.virtual_memory().total,
+                "cpu": cpu_limit,
+                "mem_bytes": memory_limit,
             }
             logger.info(
                 _(
